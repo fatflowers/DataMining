@@ -5,6 +5,18 @@ import numpy as np
 
 __author__ = 'Administrator'
 
+class Point:
+    def __init__(self):
+        self.latitude = 0.0
+        self.longitude = 0.0
+        self.time = 0.0
+
+class StayPoint:
+    def __init__(self):
+        self.latitude = 0.0
+        self.longitude = 0.0
+        self.arrivalTime = 0.0
+        self.leaveTime = 0.0
 
 def gpsDistance(pi, pj):
     lonRes = 102900
@@ -24,11 +36,24 @@ def getPointViaString(line):
     return point
 
 def getStayPoints(points, DisThreh, TimeThreh):
-    stayPoints = []
-    for i in range(0, len(points)):
-        for j in range(i + 1, len(points)):
-            if gpsDistance(points[i], points[j]) > DisThreh:
-                pass
+    listStayPoints = []
+    stayPoint = StayPoint()
+    iteOuter = 0
+    while iteOuter < len(points):
+        iteInner = iteOuter + 1
+        while iteInner < len(points):
+            if gpsDistance(points[iteOuter], points[iteInner]) > DisThreh:
+                if points[iteInner].time - points[iteOuter].time > TimeThreh:
+                    stayPoint.latitude, stayPoint.longitude = meanCoord(points[iteOuter:iteInner+1])
+                    stayPoint.arrivalTime = points[iteOuter].time
+                    stayPoint.leaveTime = points[iteInner].time
+                    listStayPoints.append(stayPoint)
+                iteOuter = iteInner
+                break
+
+    return listStayPoints
+
+
 
 def meanCoord(points):
     latitudes = [0] * len(points)
