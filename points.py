@@ -18,6 +18,10 @@ class StayPoint:
         self.arrivalTime = 0.0
         self.leaveTime = 0.0
 
+
+
+
+
 def gpsDistance(pi, pj):
     lonRes = 102900
     latRes = 110000
@@ -39,17 +43,19 @@ def getStayPoints(points, DisThreh, TimeThreh):
     listStayPoints = []
     stayPoint = StayPoint()
     iteOuter = 0
-    while iteOuter < len(points):
+    while iteOuter < len(points.trajectory):
+        print iteOuter
         iteInner = iteOuter + 1
-        while iteInner < len(points):
-            if gpsDistance(points[iteOuter], points[iteInner]) > DisThreh:
-                if points[iteInner].time - points[iteOuter].time > TimeThreh:
-                    stayPoint.latitude, stayPoint.longitude = meanCoord(points[iteOuter:iteInner+1])
-                    stayPoint.arrivalTime = points[iteOuter].time
-                    stayPoint.leaveTime = points[iteInner].time
+        while iteInner < len(points.trajectory):
+            if gpsDistance(points.trajectory[iteOuter], points.trajectory[iteInner]) > DisThreh:
+                if points.trajectory[iteInner].time - points.trajectory[iteOuter].time > TimeThreh:
+                    stayPoint.latitude, stayPoint.longitude = meanCoord(points.trajectory[iteOuter:iteInner+1])
+                    stayPoint.arrivalTime = points.trajectory[iteOuter].time
+                    stayPoint.leaveTime = points.trajectory[iteInner].time
                     listStayPoints.append(stayPoint)
                 iteOuter = iteInner
                 break
+        iteOuter = iteInner
 
     return listStayPoints
 
