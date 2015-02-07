@@ -39,23 +39,25 @@ def getPointViaString(line):
 
     return point
 
-def getStayPoints(points, DisThreh, TimeThreh):
+def getStayPoints(userTrajectories, DisThreh, TimeThreh):
     listStayPoints = []
     stayPoint = StayPoint()
     iteOuter = 0
-    while iteOuter < len(points.trajectory):
-        print iteOuter
-        iteInner = iteOuter + 1
-        while iteInner < len(points.trajectory):
-            if gpsDistance(points.trajectory[iteOuter], points.trajectory[iteInner]) > DisThreh:
-                if points.trajectory[iteInner].time - points.trajectory[iteOuter].time > TimeThreh:
-                    stayPoint.latitude, stayPoint.longitude = meanCoord(points.trajectory[iteOuter:iteInner+1])
-                    stayPoint.arrivalTime = points.trajectory[iteOuter].time
-                    stayPoint.leaveTime = points.trajectory[iteInner].time
-                    listStayPoints.append(stayPoint)
-                iteOuter = iteInner
-                break
-        iteOuter = iteInner
+    for traj in userTrajectories:
+        while iteOuter < len(traj.trajectory):
+            print iteOuter
+            iteInner = iteOuter + 1
+            while iteInner < len(traj.trajectory):
+                if gpsDistance(traj.trajectory[iteOuter], traj.trajectory[iteInner]) > DisThreh:
+                    if traj.trajectory[iteInner].time - traj.trajectory[iteOuter].time > TimeThreh:
+                        stayPoint.latitude, stayPoint.longitude = meanCoord(traj.trajectory[iteOuter:iteInner+1])
+                        stayPoint.arrivalTime = traj.trajectory[iteOuter].time
+                        stayPoint.leaveTime = traj.trajectory[iteInner].time
+                        listStayPoints.append(stayPoint)
+                    iteOuter = iteInner
+                    break
+                iteInner += 1
+            iteOuter = iteInner
 
     return listStayPoints
 
