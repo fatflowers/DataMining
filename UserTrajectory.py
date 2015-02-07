@@ -7,7 +7,7 @@ class UserTrajectory:
         self.uid = uid
         self.trajectory = trajectory
 
-def getTrajectory(uid, userDir):
+def getTrajectory_old(uid, userDir):
     Trajectory = []
 
     # global Trajectory
@@ -25,6 +25,34 @@ def getTrajectory(uid, userDir):
                 Trajectory.append(points.getPointViaString(allTheText[iterText]))
 
     return UserTrajectory(uid, Trajectory)
+
+
+def getAllTheText(fileDir):
+    file = open(fileDir)
+    try:
+        allTheText = file.read().split('\n')[6:-1]
+        # Trajectory = [points.Point()] * len(allTheText)
+    finally:
+        file.close()
+    return allTheText
+
+
+def getTrajectory(uid, userDir, DisThreh):
+    Trajectory = []
+    pointSet = []
+    # global Trajectory
+    userDir += "\\Trajectory\\"
+    fileDirs = os.listdir(userDir)
+
+    lastFileLastLine = None
+    if fileDirs != [] and len(fileDirs) > 0:
+        for dir in fileDirs:
+            allTheText = getAllTheText(userDir + dir)
+            for iterText in range(0, len(allTheText)):
+                pointSet.append(points.getPointViaString(allTheText[iterText]))
+            Trajectory.append(UserTrajectory(uid, pointSet))
+    return Trajectory
+
 
 def getLocationHistory(DataDir, DisThreh, TimeThreh):
     fileDirs = os.listdir(DataDir)
