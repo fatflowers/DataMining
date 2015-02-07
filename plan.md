@@ -10,3 +10,4 @@
 - 15
 - 16
 
+![architecture](https://github.com/sunlei99/DataMining/blob/master/Architecture.png)
