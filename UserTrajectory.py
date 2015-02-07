@@ -98,7 +98,7 @@ def getLocationHistory(DataDir, DisThreh, TimeThreh):
 
     return LocationHistory
 
-dir = 'D:\\Geolife Trajectories 1.3\\Data\\'
-a = getLocationHistory(dir, 200, 20*60)
-cPickle.dump(a, open("LocHistory.pkl", "wb"))
+# dir = 'D:\\Geolife Trajectories 1.3\\Data\\'
+# a = getLocationHistory(dir, 200, 20*60)
+# cPickle.dump(a, open("LocHistory.pkl", "wb"))
 
