@@ -22,11 +22,26 @@ class StayPoint:
 
 
 
-def gpsDistance(pi, pj):
-    lonRes = 102900
-    latRes = 110000
+def gpsDistance2(pi, pj):
+    # lonRes = 102900
+    lonRes = 102834.74258026089786013677476285
+    # latRes = 110000
+    latRes = 111712.69150641055729984301412873
     return math.sqrt(abs(pi.latitude - pj.latitude) * latRes * abs(pi.latitude - pj.latitude) * latRes
                      + abs(pi.longitude - pj.longitude) * lonRes * abs(pi.longitude - pj.longitude) * lonRes)
+
+def gpsDistance(pi, pj):
+    radLat1 = math.radians(pi.latitude)
+    radLat2 = math.radians(pj.latitude)
+    a = radLat1 - radLat2;
+    b = math.radians(pi.longitude) - math.radians(pj.longitude)
+
+    s = 2 * math.asin(math.sqrt(math.pow(math.sin(a/2), 2) +
+                                math.cos(radLat1) * math.cos(radLat2) * math.pow(math.sin(b/2), 2)))
+    EARTH_RADIUS = 6378137
+    s *= EARTH_RADIUS
+    # s = (s * 10000) / 10000
+    return s
 
 
 def getPointViaString(line):
@@ -42,10 +57,12 @@ def getPointViaString(line):
 def getStayPoints(userTrajectories, DisThreh, TimeThreh):
     listStayPoints = []
     stayPoint = StayPoint()
-    iteOuter = 0
+
     for traj in userTrajectories:
+        iteOuter = 0
+        aPointList = []
         while iteOuter < len(traj.trajectory):
-            print iteOuter
+            # print iteOuter
             iteInner = iteOuter + 1
             while iteInner < len(traj.trajectory):
                 if gpsDistance(traj.trajectory[iteOuter], traj.trajectory[iteInner]) > DisThreh:
@@ -53,11 +70,13 @@ def getStayPoints(userTrajectories, DisThreh, TimeThreh):
                         stayPoint.latitude, stayPoint.longitude = meanCoord(traj.trajectory[iteOuter:iteInner+1])
                         stayPoint.arrivalTime = traj.trajectory[iteOuter].time
                         stayPoint.leaveTime = traj.trajectory[iteInner].time
-                        listStayPoints.append(stayPoint)
+                        aPointList.append(stayPoint)
                     iteOuter = iteInner
                     break
                 iteInner += 1
             iteOuter = iteInner
+        listStayPoints.append(aPointList)
+        # listStayPoints = [listStayPoints, aPointList]
 
     return listStayPoints
 

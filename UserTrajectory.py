@@ -1,14 +1,18 @@
-#-*- coding:GBK -*-
+# -*- coding:GBK -*-
 import os
 import points
 import cPickle
+import sys
+import test
 
 __author__ = 'Administrator'
+
 
 class UserTrajectory:
     def __init__(self, uid, trajectory):
         self.uid = uid
         self.trajectory = trajectory
+
 
 def getTrajectory_old(uid, userDir):
     Trajectory = []
@@ -41,6 +45,8 @@ def getAllTheText(fileDir):
 
 
 def parsePltFile(fileDir):
+    # print test.iii
+    # test.iii += 1
     file = open(fileDir)
     pointSet = []
     try:
@@ -52,9 +58,12 @@ def parsePltFile(fileDir):
         pointSet.append(points.getPointViaString(allTheText[iterText]))
     return pointSet
 
+
 """
 Return a list of trajectory for a certain user.
 """
+
+
 def getTrajectory(uid, userDir, DisThreh, TimeThreh):
     Trajectory = []
     pointSet = []
@@ -68,14 +77,15 @@ def getTrajectory(uid, userDir, DisThreh, TimeThreh):
         while dir < len(fileDirs):
             pointSet = parsePltFile(userDir + fileDirs[dir])
             addFile = 1
-            while True: #and dir + addFile < len(fileDirs):# 加上时间条件
+            while True:  #and dir + addFile < len(fileDirs):# 加上时间条件
                 if dir + addFile >= len(fileDirs):
                     dir = dir + addFile
                     break
                 tmpFile = open(userDir + fileDirs[dir + addFile])
                 tmpPoint = points.getPointViaString(tmpFile.read().split('\n')[6])
                 tmpFile.close()
-                if points.gpsDistance(pointSet[-1], tmpPoint) > DisThreh and tmpPoint.time - pointSet[-1].time > TimeThreh:
+                if points.gpsDistance(pointSet[-1], tmpPoint) > DisThreh and tmpPoint.time - pointSet[
+                    -1].time > TimeThreh:
                     dir = dir + addFile
                     break
                 pointSet += parsePltFile(userDir + fileDirs[dir + addFile])
@@ -93,12 +103,16 @@ def getLocationHistory(DataDir, DisThreh, TimeThreh):
     LocationHistory = []
     if fileDirs != [] and len(fileDirs) > 0:
         for uid in range(0, len(fileDirs)):
-            print DataDir+fileDirs[uid]
-            LocationHistory.append(UserTrajectory(uid, points.getStayPoints(getTrajectory(uid, DataDir+fileDirs[uid], DisThreh, TimeThreh), DisThreh, TimeThreh)))
+            print DataDir + fileDirs[uid]
+            LocationHistory.append(UserTrajectory(uid, points.getStayPoints(
+                getTrajectory(uid, DataDir + fileDirs[uid], DisThreh, TimeThreh), DisThreh, TimeThreh)))
 
     return LocationHistory
 
+
+# sys.setrecursionlimit(10000000)  #设置递归深度为10,000,000
 # dir = 'D:\\Geolife Trajectories 1.3\\Data\\'
-# a = getLocationHistory(dir, 200, 20*60)
+# a = getLocationHistory(dir, 200, 20 * 60)
 # cPickle.dump(a, open("LocHistory.pkl", "wb"))
+
 
