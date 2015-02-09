@@ -1,3 +1,4 @@
+# -*- coding:GBK -*-
 '''
  -------------------------------------------------------------------------
  Function:
@@ -40,69 +41,109 @@ Dependencies include scipy, numpy, and hcluster.
 bhclowers at gmail.com
 '''
 
-
 import numpy as N
 import hcluster as H
+import cPickle
+import sys
+
+
+def euclideanDist(x1, y1, x2, y2):
+    return N.sqrt(N.square(x1 - x2) + N.square(y1 - y2))
 
 
 
-def optics(x, k, distMethod = 'euclidean'):
-    if len(x.shape)>1:
-        m,n = x.shape
+def writePointwiseDistance(x):
+
+    sys.setrecursionlimit(100000000)  # 设置递归深度为10,000,000
+    m, n = x.shape
+    D = []
+    D.append([0.0] * m)
+    D = D * m
+    for iterOut in range(0, m):
+        print iterOut
+        for iterIn in range(iterOut + 1, m):
+            D[iterIn][iterOut] = D[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
+                                                                    x[iterIn][1])
+
+    cPickle.dump(D, open("pointwiseDistance.pkl", "wb"))
+
+def optics(x, k, distMethod='euclidean'):
+    if len(x.shape) > 1:
+        m, n = x.shape
     else:
         m = x.shape[0]
         n = 1
 
     try:
-        D = H.squareform(H.pdist(x, distMethod))
+        # tmp = H.pdist(x, distMethod)
+        # D = H.squareform(tmp)
+
+
+        # D = H.squareform(H.pdist(x, distMethod))
+        # ## the following 6 lines will take the place of the above line
+        # D = []
+        # D.append([0.0] * m)
+        # D = D * m
+        # for iterOut in range(0, m):
+        #     print iterOut
+        #     for iterIn in range(iterOut + 1, m):
+        #         D[iterIn][iterOut] = D[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
+        #                                                                 x[iterIn][1])
+        sys.setrecursionlimit(100000000)  # 设置递归深度为100,000,000
+        D = cPickle.load(open('pointwiseDistance.pkl', 'rb'))
         distOK = True
     except Exception, ex:
         print ex
         print "squareform or pdist error"
         distOK = False
+        return
+
 
 
     CD = N.zeros(m)
-    RD = N.ones(m)*1E10
+    RD = N.ones(m) * 1E10
 
     for i in xrange(m):
-        #again you can use the euclid function if you don't want hcluster
-#        d = euclid(x[i],x)
-#        d.sort()
-#        CD[i] = d[k]
+        # again you can use the euclid function if you don't want hcluster
+        #        d = euclid(x[i],x)
+        #        d.sort()
+        #        CD[i] = d[k]
 
-        tempInd = D[i].argsort()
-        tempD = D[i][tempInd]
-#        tempD.sort() #we don't use this function as it changes the reference
-        CD[i] = tempD[k]#**2
-
+        # tempInd = D[i].argsort()
+        # tempD = D[i][tempInd]
+        # #        tempD.sort() #we don't use this function as it changes the reference
+        # CD[i] = tempD[k]  #**2
+        # ## the following 2 line will take the place of the above 4 lines
+        tempD = list(D[i])
+        tempD.sort()
+        CD[i] = tempD[k]
 
     order = []
-    seeds = N.arange(m, dtype = N.int)
+    seeds = N.arange(m, dtype=N.int)
 
     ind = 0
     while len(seeds) != 1:
-#    for seed in seeds:
+        # for seed in seeds:
         ob = seeds[ind]
         seedInd = N.where(seeds != ob)
         seeds = seeds[seedInd]
 
         order.append(ob)
-        tempX = N.ones(len(seeds))*CD[ob]
-        tempD = D[ob][seeds]#[seeds]
+        tempX = N.ones(len(seeds)) * CD[ob]
+        tempD = N.array(D[ob])[seeds]  #[seeds]
         #you can use this function if you don't want to use hcluster
         #tempD = euclid(x[ob],x[seeds])
 
         temp = N.column_stack((tempX, tempD))
-        mm = N.max(temp, axis = 1)
-        ii = N.where(RD[seeds]>mm)[0]
+        mm = N.max(temp, axis=1)
+        ii = N.where(RD[seeds] > mm)[0]
         RD[seeds[ii]] = mm[ii]
         ind = N.argmin(RD[seeds])
 
-
     order.append(seeds[0])
-    RD[0] = 0 #we set this point to 0 as it does not get overwritten
+    RD[0] = 0  # we set this point to 0 as it does not get overwritten
     return RD, CD, order
+
 
 def euclid(i, x):
     """euclidean(i, x) -> euclidean distance between x and y"""
@@ -112,6 +153,6 @@ def euclid(i, x):
     if len(x) != len(y):
         raise ValueError, "vectors must be same length"
 
-    d = (x-y)**2
-    return N.sqrt(N.sum(d, axis = 1))
+    d = (x - y) ** 2
+    return N.sqrt(N.sum(d, axis=1))
 

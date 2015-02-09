@@ -108,10 +108,10 @@ def clusterTree(node, parentNode, localMaximaPoints, RPlot, RPoints, min_cluster
     '''
 
     #the maximum ratio we allow of average height of clusters on the right and left to the local maxima in question
-    maximaRatio = .75
+    maximaRatio = .5
 	
     #if ratio above exceeds maximaRatio, find which of the clusters to the left and right to reject based on rejectionRatio
-    rejectionRatio = .7
+    rejectionRatio = .35
 	
     if float(avgReachValue1 / float(RPlot[s])) > maximaRatio or float(avgReachValue2 / float(RPlot[s])) > maximaRatio:
 
