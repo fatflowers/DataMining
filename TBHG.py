@@ -46,7 +46,8 @@ def getTBHG():
     #run the OPTICS algorithm on the points, using a smoothing value (0 = no smoothing)
 
     ### ¥”¥≈≈Ã∂¡»°æ‡¿Îæÿ’Û
-    OP.writePointwiseDistance(stayPointMatrix)
+    # OP.writePointwiseDistance(stayPointMatrix)
+
     RD, CD, order = OP.optics(stayPointMatrix, 9)
 
     cPickle.dump([RD, CD, order], open('opticsResult.pkl', 'wb'))
