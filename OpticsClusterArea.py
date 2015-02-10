@@ -90,6 +90,13 @@ def writePointwiseDistance(x):
 
     # cPickle.dump(D, open("pointwiseDistance.pkl", "wb"))
 
+
+def getPointDistance(rowIndex):
+    nrowsPerFile = 5000
+    currentFileNo = rowIndex / nrowsPerFile
+    return currentFileNo, cPickle.load(open('pointDistance\\' + str(currentFileNo), 'wb'))
+
+
 def optics(x, k, distMethod='euclidean'):
     if len(x.shape) > 1:
         m, n = x.shape
@@ -122,6 +129,8 @@ def optics(x, k, distMethod='euclidean'):
         return
 
 
+    currentFileNo = None
+    nrowsPerFile = 5000
 
     CD = N.zeros(m)
     RD = N.ones(m) * 1E10
@@ -137,7 +146,9 @@ def optics(x, k, distMethod='euclidean'):
         # #        tempD.sort() #we don't use this function as it changes the reference
         # CD[i] = tempD[k]  #**2
         # ## the following 2 line will take the place of the above 4 lines
-        tempD = list(D[i])
+        if currentFileNo is None or i / nrowsPerFile != currentFileNo:
+            currentFileNo, D = getPointDistance(i)
+        tempD = list(D[i % nrowsPerFile])
         tempD.sort()
         CD[i] = tempD[k]
 
@@ -153,7 +164,10 @@ def optics(x, k, distMethod='euclidean'):
 
         order.append(ob)
         tempX = N.ones(len(seeds)) * CD[ob]
-        tempD = N.array(D[ob])[seeds]  #[seeds]
+        # 此处肯定访问过D，所以nrowsPerFile不可能为None
+        if ob / nrowsPerFile != currentFileNo:
+            currentFileNo, D = getPointDistance(ob)
+        tempD = N.array(D[ob % nrowsPerFile])[seeds]  #[seeds]
         #you can use this function if you don't want to use hcluster
         #tempD = euclid(x[ob],x[seeds])
 
