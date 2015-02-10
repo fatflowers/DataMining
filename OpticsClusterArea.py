@@ -48,7 +48,7 @@ import sys
 
 
 def euclideanDist(x1, y1, x2, y2):
-    return N.sqrt(N.square(x1 - x2) + N.square(y1 - y2))
+    return N.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 
 
@@ -56,16 +56,39 @@ def writePointwiseDistance(x):
 
     sys.setrecursionlimit(100000000)  # 设置递归深度为10,000,000
     m, n = x.shape
-    D = []
-    D.append([0.0] * m)
-    D = D * m
+    # D = []
+    # D.append([0.0] * m)
+    # D = D * m
+
+    # D = [[0.0 for col in range(m)] for row in range(m)]
+###wrong code...
+    # D = []
+    # row = N.array([0.0] *m)
+    # for i in range(m):
+    #     D.append(N.array(row))
+    #
+    # for iterOut in range(0, m):
+    #     print iterOut
+    #     for iterIn in range(iterOut + 1, m):
+    #         D[iterIn][iterOut] = D[iterOut][iterIn] = float(euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
+    #                                                                       x[iterIn][1]))
+###
+    nrowsPerFile = 5000
+    fileNumber = 0
+    oneRow = [0.0] * m
+
+    D = [list(oneRow) for row in range(nrowsPerFile)]
     for iterOut in range(0, m):
         print iterOut
-        for iterIn in range(iterOut + 1, m):
-            D[iterIn][iterOut] = D[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
-                                                                    x[iterIn][1])
+        if iterOut % nrowsPerFile == 0 and iterOut != 0:
+            cPickle.dump(D, open('pointDistance\\' + str(fileNumber), 'wb'))
+            D = [list(oneRow) for row in range(fileNumber)]
+            fileNumber += 1
+        for iterIn in range(0, m):
+            D[iterOut % nrowsPerFile][iterIn] = float(euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1]))
 
-    cPickle.dump(D, open("pointwiseDistance.pkl", "wb"))
+
+    # cPickle.dump(D, open("pointwiseDistance.pkl", "wb"))
 
 def optics(x, k, distMethod='euclidean'):
     if len(x.shape) > 1:
