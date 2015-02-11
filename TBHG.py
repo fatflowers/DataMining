@@ -9,6 +9,15 @@ import AutomaticClustering as AutoC
 
 import cPickle
 
+
+def linkClusters(levelNodes, stayPointNumber):
+    if len(levelNodes) != 1:
+        nextLevelNodes = []
+        for node in levelNodes:
+            pass
+    pass
+
+
 def getTBHG():
     LocHistory = cPickle.load(open('LocHistory.pkl', 'rb'))
 

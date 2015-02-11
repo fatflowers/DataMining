@@ -48,7 +48,7 @@ plt.savefig('Graph.png', dpi=None, facecolor='w', edgecolor='w',
     transparent=False, bbox_inches=None, pad_inches=0.1)
 plt.show()
 
-OP.writePointwiseDistance(X)
+# OP.writePointwiseDistance(X)
 
 #run the OPTICS algorithm on the points, using a smoothing value (0 = no smoothing)
 RD, CD, order = OP.optics(X,9)

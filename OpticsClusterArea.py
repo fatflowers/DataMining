@@ -73,7 +73,7 @@ def writePointwiseDistance(x):
     #         D[iterIn][iterOut] = D[iterOut][iterIn] = float(euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
     #                                                                       x[iterIn][1]))
 ###
-    nrowsPerFile = 5000
+    nrowsPerFile = 1000
     fileNumber = 0
     oneRow = [0.0] * m
 
@@ -82,19 +82,21 @@ def writePointwiseDistance(x):
         print iterOut
         if iterOut % nrowsPerFile == 0 and iterOut != 0:
             cPickle.dump(D, open('pointDistance\\' + str(fileNumber), 'wb'))
-            D = [list(oneRow) for row in range(fileNumber)]
+            D = [list(oneRow) for row in range(nrowsPerFile)]
             fileNumber += 1
         for iterIn in range(0, m):
             D[iterOut % nrowsPerFile][iterIn] = float(euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1]))
+
+    cPickle.dump(D, open('pointDistance\\' + str(fileNumber), 'wb'))
 
 
     # cPickle.dump(D, open("pointwiseDistance.pkl", "wb"))
 
 
 def getPointDistance(rowIndex):
-    nrowsPerFile = 5000
+    nrowsPerFile = 1000
     currentFileNo = rowIndex / nrowsPerFile
-    return currentFileNo, cPickle.load(open('pointDistance\\' + str(currentFileNo), 'wb'))
+    return currentFileNo, cPickle.load(open('pointDistance\\' + str(currentFileNo), 'rb'))
 
 
 def optics(x, k, distMethod='euclidean'):
@@ -120,7 +122,7 @@ def optics(x, k, distMethod='euclidean'):
         #         D[iterIn][iterOut] = D[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
         #                                                                 x[iterIn][1])
         sys.setrecursionlimit(100000000)  # 设置递归深度为100,000,000
-        D = cPickle.load(open('pointwiseDistance.pkl', 'rb'))
+        # D = cPickle.load(open('pointwiseDistance.pkl', 'rb'))
         distOK = True
     except Exception, ex:
         print ex
@@ -130,7 +132,7 @@ def optics(x, k, distMethod='euclidean'):
 
 
     currentFileNo = None
-    nrowsPerFile = 5000
+    nrowsPerFile = 1000
 
     CD = N.zeros(m)
     RD = N.ones(m) * 1E10
