@@ -45,6 +45,7 @@ import numpy as N
 # import hcluster as H
 import cPickle
 import sys
+from random import randint
 
 
 def euclideanDist(x1, y1, x2, y2):
@@ -100,13 +101,46 @@ def getPointDistance(rowIndex):
 
 
 def optics(x, k, distMethod='euclidean'):
-    def getPointDistance(rowNumber):
-        if rowNumber < 10000:
-            return D1[rowNumber]
-        elif rowNumber < 20000:
-            return D2[rowNumber - 10000]
-        elif rowNumber < 30000:
-            return D3[rowNumber - 20000]
+    def getDistanceRow(rowNumber):
+        row = [0.0] * m
+        for iterRow in range(m):
+            row[iterRow] = euclideanDist(x[rowNumber][0], x[rowNumber][1], x[iterRow][0], x[iterRow][1])
+        return row
+
+    def findKthNumber(oneRow, k):
+        if k == len(oneRow):
+            return max(oneRow)
+        randIndex = randint(0, len(oneRow) - 1)
+        # print k, randIndex, oneRow
+        Sa = [0.0] * len(oneRow)
+        Sb = [0.0] * len(oneRow)
+
+        lenSa = 0
+        lenSb = 0
+
+        allTheSame = True
+
+        for elementIndex in range(len(oneRow)):
+            if allTheSame and elementIndex > 0 and oneRow[elementIndex - 1] != oneRow[elementIndex]:
+                allTheSame = False
+            if oneRow[elementIndex] < oneRow[randIndex]:
+                Sa[lenSa] = oneRow[elementIndex]
+                lenSa += 1
+            else:
+                Sb[lenSb] = oneRow[elementIndex]
+                lenSb += 1
+
+        if allTheSame:
+            return oneRow[0]
+
+        if lenSa > k:
+            return findKthNumber(Sa[:lenSa], k)
+        elif lenSa == k:
+            return max(Sa[:lenSa])
+        else:
+            return findKthNumber(Sb[:lenSb], k - lenSa)
+
+
 
     if len(x.shape) > 1:
         m, n = x.shape
@@ -115,65 +149,7 @@ def optics(x, k, distMethod='euclidean'):
         n = 1
 
     try:
-        # tmp = H.pdist(x, distMethod)
-        # D = H.squareform(tmp)
-
-
-        # D = H.squareform(H.pdist(x, distMethod))
-        # ## the following 6 lines will take the place of the above line
-        # D = []
-        # D.append([0.0] * m)
-        # D = D * m
-        D = []
-        oneRow = [0.0] * m
-        # for row in range(m):
-        #     print row, m
-        #     D.append(list(oneRow))
-        # # D = [[0.0] * m for row in range(m)]
-        # print "Optics getting D"
-        # for iterOut in range(0, m):
-        #     print "iterOut:" + str(iterOut)
-        #     print iterOut
-        #     for iterIn in range(iterOut + 1, m):
-        #         D[iterIn][iterOut] = D[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
-        #                                                                 x[iterIn][1])
-
-        # # compute and save the point distance
-        D1 = []
-        D2 = []
-        D3 = []
-        D1 = [oneRow for i in range(0, 10000)]
-        D2 = [oneRow for i in range(0, 10000)]
-        D3 = [oneRow for i in range(0, 6000)]
-        for iterOut in range(0, m):
-            print "iterOut:" + str(iterOut)
-            # print iterOut
-            for iterIn in range(0, m):
-                D1[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1])
-        # for iterOut in range(10000, 20000):
-        #     print "iterOut:" + str(iterOut)
-        #     # print iterOut
-        #     for iterIn in range(0, m):
-        #         D2[iterOut - 10000][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1])
-        #
-        # for iterOut in range(20000, m):
-        #     print "iterOut:" + str(iterOut)
-        #     # print iterOut
-        #     for iterIn in range(0, m):
-        #         D2[iterOut - 20000][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1])
-
-
-        # cPickle.dump(D1, open('pointDistance\\pD1.pkl', 'wb'), cPickle.HIGHEST_PROTOCOL)
-        # cPickle.dump(D2, open('pointDistance\\pD2.pkl', 'wb'), cPickle.HIGHEST_PROTOCOL)
-        # cPickle.dump(D3, open('pointDistance\\pD3.pkl', 'wb'), cPickle.HIGHEST_PROTOCOL)
-
-        # # load point distances from files
-        # D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))
-        # D2 = cPickle.load(open('pointDistance\\pD2.pkl', 'rb'))
-        # D3 = cPickle.load(open('pointDistance\\pD3.pkl', 'rb'))
-        # sys.setrecursionlimit(100000000)  # 设置递归深度为100,000,000
-        # D = cPickle.load(open('pointwiseDistance.pkl', 'rb'))
-        distOK = True
+        pass
     except Exception, ex:
         print ex
         print "squareform or pdist error"
@@ -200,22 +176,28 @@ def optics(x, k, distMethod='euclidean'):
         # CD[i] = tempD[k]  #**2
         # ## the following 2 line will take the place of the above 4 lines
         # if currentFileNo is None or i / nrowsPerFile != currentFileNo:
-        #     currentFileNo, D = getPointDistance(i)
+        #     currentFileNo, D = getDistanceRow(i)
         # tempD = list(D[i % nrowsPerFile])
-        tempD = list(getPointDistance(i))
+        tempD = list(getDistanceRow(i))
         # print tempD
         tempD.sort()
         CD[i] = tempD[k]
+
+        # # alternative function faster
+        # CD[i] = findKthNumber(getPointDistance(i), k)
 
     order = []
     seeds = N.arange(m, dtype=N.int)
 
     ind = 0
-    print "main loop"
+    count = 0
     while len(seeds) != 1:
         # for seed in seeds:
         ob = seeds[ind]
-        print "ob = " + str(ob)
+
+        print "main loop" + str(count)
+        count += 1
+
         seedInd = N.where(seeds != ob)
         seeds = seeds[seedInd]
 
@@ -223,8 +205,8 @@ def optics(x, k, distMethod='euclidean'):
         tempX = N.ones(len(seeds)) * CD[ob]
         # 此处肯定访问过D，所以nrowsPerFile不可能为None
         # if ob / nrowsPerFile != currentFileNo:
-        #     currentFileNo, D = getPointDistance(ob)
-        tempD = N.array(getPointDistance(ob))[seeds]  #[seeds]
+        #     currentFileNo, D = getDistanceRow(ob)
+        tempD = N.array(getDistanceRow(ob))[seeds]  #[seeds]
         #you can use this function if you don't want to use hcluster
         #tempD = euclid(x[ob],x[seeds])
 

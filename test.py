@@ -1,4 +1,5 @@
 # -*- coding:GBK -*-
+from random import randint
 import cPickle
 # __author__ = 'Administrator'
 # from OpticsClusterArea import *
@@ -70,11 +71,49 @@ def test(a):
 # test(a)
 # print a
 
+def findKthNumber(oneRow, k):
+    if k == len(oneRow):
+        return max(oneRow)
+    randIndex = randint(0, len(oneRow) - 1)
+    # print k, randIndex, oneRow
+    Sa = [0.0] * len(oneRow)
+    Sb = [0.0] * len(oneRow)
 
-a = cPickle.load(open('opticsResult.pkl', 'rb'))
+    lenSa = 0
+    lenSb = 0
 
-rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
+    allTheSame = True
 
-D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))[:4]
+    for elementIndex in range(len(oneRow)):
+        if allTheSame and elementIndex > 0 and oneRow[elementIndex - 1] != oneRow[elementIndex]:
+            allTheSame = False
+        if oneRow[elementIndex] < oneRow[randIndex]:
+            Sa[lenSa] = oneRow[elementIndex]
+            lenSa += 1
+        else:
+            Sb[lenSb] = oneRow[elementIndex]
+            lenSb += 1
+
+    if allTheSame:
+        return oneRow[0]
+
+    if lenSa > k:
+        return findKthNumber(Sa[:lenSa], k)
+    elif lenSa == k:
+        return max(Sa[:lenSa])
+    else:
+        return findKthNumber(Sb[:lenSb], k - lenSa)
+
+
+# a = cPickle.load(open('opticsResult.pkl', 'rb'))
+#
+# rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
+#
+# D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))[:4]
+
+a = [1,2,3,4,5,6,7,8,9,9,4,4,4,4,4]
+# for i in range(1, len(a) + 1):
+#     print findKthNumber(a, i)
+print findKthNumber(a, 1)
 
 b = 0
