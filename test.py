@@ -105,15 +105,15 @@ def findKthNumber(oneRow, k):
         return findKthNumber(Sb[:lenSb], k - lenSa)
 
 
-# a = cPickle.load(open('opticsResult.pkl', 'rb'))
-#
-# rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
-#
-# D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))[:4]
+a = cPickle.load(open('opticsResult.pkl', 'rb'))
 
-a = [1,2,3,4,5,6,7,8,9,9,4,4,4,4,4]
-# for i in range(1, len(a) + 1):
-#     print findKthNumber(a, i)
-print findKthNumber(a, 1)
+rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
+
+D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))[:4]
+
+# a = [1,2,3,4,5,6,7,8,9,9,4,4,4,4,4]
+# # for i in range(1, len(a) + 1):
+# #     print findKthNumber(a, i)
+# print findKthNumber(a, 1)
 
 b = 0
