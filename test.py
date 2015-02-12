@@ -1,5 +1,5 @@
 # -*- coding:GBK -*-
-
+import cPickle
 # __author__ = 'Administrator'
 # from OpticsClusterArea import *
 # import numpy as np
@@ -58,7 +58,23 @@ def test(a):
         for aaa in aa:
             for aaaa in range(len(aaa)):
                 aaa[aaaa] = 3
+# D = []
+# for row in range(3):
+#     D.append([0.0]*3)
+#
+# D[0][0] = 3
+# print D
+# f = open('LocHistory.pkl', 'rb')
+# # LocHistory = cPickle.load(open('LocHistory.pkl', 'rb'))
+# a = [[[1, 2]]]
+# test(a)
+# print a
 
-a = [[[1, 2]]]
-test(a)
-print a
+
+a = cPickle.load(open('opticsResult.pkl', 'rb'))
+
+rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
+
+D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))[:4]
+
+b = 0

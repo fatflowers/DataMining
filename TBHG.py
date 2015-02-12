@@ -1,7 +1,7 @@
 # -*- coding:GBK -*-
 __author__ = 'Administrator'
 from UserTrajectory import *
-import numpy as np
+# import numpy as np
 from points import *
 import matplotlib.pyplot as plt
 import OpticsClusterArea as OP
@@ -42,24 +42,24 @@ def getTBHG():
         stayPointNumber.append(userStayPointNumber)
 
     ### plot the distribution
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    #
-    # ax.plot(stayPointMatrix[:,0], stayPointMatrix[:,1], 'b.', ms=2)
-    #
-    # plt.savefig('Graph.png', dpi=None, facecolor='w', edgecolor='w',
-    #     orientation='portrait', papertype=None, format=None,
-    #     transparent=False, bbox_inches=None, pad_inches=0.1)
-    # plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    ax.plot(stayPointMatrix[:,0], stayPointMatrix[:,1], 'b.', ms=2)
+
+    plt.savefig('Graph.png', dpi=None, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1)
+    plt.show()
 
     #run the OPTICS algorithm on the points, using a smoothing value (0 = no smoothing)
 
     ### 从磁盘读取距离矩阵
-    OP.writePointwiseDistance(stayPointMatrix)
+    # OP.writePointwiseDistance(stayPointMatrix)
 
     RD, CD, order = OP.optics(stayPointMatrix, 9)
 
-    # cPickle.dump([RD, CD, order], open('opticsResult.pkl', 'wb'))
+    cPickle.dump([RD, CD, order], open('opticsResult.pkl', 'wb'))
 
     RPlot = []
     RPoints = []
@@ -70,11 +70,12 @@ def getTBHG():
 
     #hierarchically cluster the data
     rootNode = AutoC.automaticCluster(RPlot, RPoints)
+    cPickle.dump(rootNode, open('rootNode.pkl', 'wb'))
     AutoC.graphTree(rootNode, RPlot)
     o = 0
 
 
-
+# if __name__ == "__main__":
 getTBHG()
 # LocHistory = cPickle.load(open('LocHistory.pkl', 'rb'))
 # sum = 0

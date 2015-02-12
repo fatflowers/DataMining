@@ -42,7 +42,7 @@ bhclowers at gmail.com
 '''
 
 import numpy as N
-import hcluster as H
+# import hcluster as H
 import cPickle
 import sys
 
@@ -100,6 +100,14 @@ def getPointDistance(rowIndex):
 
 
 def optics(x, k, distMethod='euclidean'):
+    def getPointDistance(rowNumber):
+        if rowNumber < 10000:
+            return D1[rowNumber]
+        elif rowNumber < 20000:
+            return D2[rowNumber - 10000]
+        elif rowNumber < 30000:
+            return D3[rowNumber - 20000]
+
     if len(x.shape) > 1:
         m, n = x.shape
     else:
@@ -116,12 +124,54 @@ def optics(x, k, distMethod='euclidean'):
         # D = []
         # D.append([0.0] * m)
         # D = D * m
+        D = []
+        oneRow = [0.0] * m
+        # for row in range(m):
+        #     print row, m
+        #     D.append(list(oneRow))
+        # # D = [[0.0] * m for row in range(m)]
+        # print "Optics getting D"
         # for iterOut in range(0, m):
+        #     print "iterOut:" + str(iterOut)
         #     print iterOut
         #     for iterIn in range(iterOut + 1, m):
         #         D[iterIn][iterOut] = D[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0],
         #                                                                 x[iterIn][1])
-        sys.setrecursionlimit(100000000)  # 设置递归深度为100,000,000
+
+        # # compute and save the point distance
+        D1 = []
+        D2 = []
+        D3 = []
+        D1 = [oneRow for i in range(0, 10000)]
+        D2 = [oneRow for i in range(0, 10000)]
+        D3 = [oneRow for i in range(0, 6000)]
+        for iterOut in range(0, m):
+            print "iterOut:" + str(iterOut)
+            # print iterOut
+            for iterIn in range(0, m):
+                D1[iterOut][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1])
+        # for iterOut in range(10000, 20000):
+        #     print "iterOut:" + str(iterOut)
+        #     # print iterOut
+        #     for iterIn in range(0, m):
+        #         D2[iterOut - 10000][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1])
+        #
+        # for iterOut in range(20000, m):
+        #     print "iterOut:" + str(iterOut)
+        #     # print iterOut
+        #     for iterIn in range(0, m):
+        #         D2[iterOut - 20000][iterIn] = euclideanDist(x[iterOut][0], x[iterOut][1], x[iterIn][0], x[iterIn][1])
+
+
+        # cPickle.dump(D1, open('pointDistance\\pD1.pkl', 'wb'), cPickle.HIGHEST_PROTOCOL)
+        # cPickle.dump(D2, open('pointDistance\\pD2.pkl', 'wb'), cPickle.HIGHEST_PROTOCOL)
+        # cPickle.dump(D3, open('pointDistance\\pD3.pkl', 'wb'), cPickle.HIGHEST_PROTOCOL)
+
+        # # load point distances from files
+        # D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))
+        # D2 = cPickle.load(open('pointDistance\\pD2.pkl', 'rb'))
+        # D3 = cPickle.load(open('pointDistance\\pD3.pkl', 'rb'))
+        # sys.setrecursionlimit(100000000)  # 设置递归深度为100,000,000
         # D = cPickle.load(open('pointwiseDistance.pkl', 'rb'))
         distOK = True
     except Exception, ex:
@@ -138,6 +188,7 @@ def optics(x, k, distMethod='euclidean'):
     RD = N.ones(m) * 1E10
 
     for i in xrange(m):
+        print i, m
         # again you can use the euclid function if you don't want hcluster
         #        d = euclid(x[i],x)
         #        d.sort()
@@ -148,9 +199,11 @@ def optics(x, k, distMethod='euclidean'):
         # #        tempD.sort() #we don't use this function as it changes the reference
         # CD[i] = tempD[k]  #**2
         # ## the following 2 line will take the place of the above 4 lines
-        if currentFileNo is None or i / nrowsPerFile != currentFileNo:
-            currentFileNo, D = getPointDistance(i)
-        tempD = list(D[i % nrowsPerFile])
+        # if currentFileNo is None or i / nrowsPerFile != currentFileNo:
+        #     currentFileNo, D = getPointDistance(i)
+        # tempD = list(D[i % nrowsPerFile])
+        tempD = list(getPointDistance(i))
+        # print tempD
         tempD.sort()
         CD[i] = tempD[k]
 
@@ -158,18 +211,20 @@ def optics(x, k, distMethod='euclidean'):
     seeds = N.arange(m, dtype=N.int)
 
     ind = 0
+    print "main loop"
     while len(seeds) != 1:
         # for seed in seeds:
         ob = seeds[ind]
+        print "ob = " + str(ob)
         seedInd = N.where(seeds != ob)
         seeds = seeds[seedInd]
 
         order.append(ob)
         tempX = N.ones(len(seeds)) * CD[ob]
         # 此处肯定访问过D，所以nrowsPerFile不可能为None
-        if ob / nrowsPerFile != currentFileNo:
-            currentFileNo, D = getPointDistance(ob)
-        tempD = N.array(D[ob % nrowsPerFile])[seeds]  #[seeds]
+        # if ob / nrowsPerFile != currentFileNo:
+        #     currentFileNo, D = getPointDistance(ob)
+        tempD = N.array(getPointDistance(ob))[seeds]  #[seeds]
         #you can use this function if you don't want to use hcluster
         #tempD = euclid(x[ob],x[seeds])
 
