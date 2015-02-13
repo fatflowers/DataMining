@@ -1,4 +1,10 @@
 # -*- coding:GBK -*-
+
+import numpy as np
+import matplotlib.pyplot as plt
+import OpticsClusterArea as OP
+from itertools import *
+import AutomaticClustering as AutoC
 from random import randint
 import cPickle
 # __author__ = 'Administrator'
@@ -105,11 +111,74 @@ def findKthNumber(oneRow, k):
         return findKthNumber(Sb[:lenSb], k - lenSa)
 
 
-a = cPickle.load(open('opticsResult.pkl', 'rb'))
+opticsResult = cPickle.load(open('opticsResult.pkl', 'rb'))
+RD = opticsResult[0]
+CD = opticsResult[1]
+order = opticsResult[2]
+RPlot = []
+RPoints = []
+
+
+
 
 rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
+# AutoC.graphTree(rootNode, RPlot)
 
-D1 = cPickle.load(open('pointDistance\\pD1.pkl', 'rb'))[:4]
+#get only the leaves of the tree
+leaves = AutoC.getLeaves(rootNode, [])
+
+#graph the points and the leaf clusters that have been found by OPTICS
+fig = plt.figure()
+ax = fig.add_subplot(111)
+LocHistory = cPickle.load(open('LocHistory.pkl', 'rb'))
+
+numPoints = 0
+for user in LocHistory:
+    for traj in user.trajectory:
+        numPoints += len(traj)
+
+stayPointNumber = []
+stayPointMatrix = np.zeros((numPoints, 2))
+
+iterPoint = 0
+for user in LocHistory:
+    userStayPointNumber = []
+    for traj in user.trajectory:
+        userTrajectory = []
+        for iter in traj:
+            userTrajectory.append(iterPoint)
+            stayPointMatrix[iterPoint] = [iter.latitude, iter.longitude]
+            iterPoint += 1
+        userStayPointNumber.append(userTrajectory)
+    stayPointNumber.append(userStayPointNumber)
+
+for item in order:
+    RPlot.append(RD[item]) #Reachability Plot
+    RPoints.append([stayPointMatrix[item][0],stayPointMatrix[item][1]]) #points in their order determined by OPTICS
+
+ax.plot(stayPointMatrix[:,0], stayPointMatrix[:,1], 'y.')
+colorString = 'bgrcmyk'
+colors = cycle(colorString)
+colorCounter = 0
+for item, c in zip(leaves, colors):
+    node = []
+    for v in range(item.start,item.end):
+        node.append(RPoints[v])
+    node = np.array(node)
+    if colorCounter / len(colorString) == 0:
+        marker = 'o'
+    elif colorCounter / len(colorString) == 1:
+        marker = '+'
+    else:
+        marker = '*'
+    ax.plot(node[:,0],node[:,1], c + marker, ms=5)
+
+    colorCounter += 1
+
+plt.savefig('Graph2.png', dpi=None, facecolor='w', edgecolor='w',
+    orientation='portrait', papertype=None, format=None,
+    transparent=False, bbox_inches=None, pad_inches=0.1)
+plt.show()
 
 # a = [1,2,3,4,5,6,7,8,9,9,4,4,4,4,4]
 # # for i in range(1, len(a) + 1):
