@@ -111,8 +111,8 @@ def getLocationHistory(DataDir, DisThreh, TimeThreh):
 
 
 # sys.setrecursionlimit(10000000)  #设置递归深度为10,000,000
-# dir = 'E:\\simon\\Geolife Trajectories 1.3\\Data\\'
+# dir = 'D:\\Geolife Trajectories 1.3\\Data\\'
 # a = getLocationHistory(dir, 200, 20 * 60)
-# cPickle.dump(a, open("LocHistory.pkl", "wb"))
+# cPickle.dump(a, open("LocHistory2.pkl", "wb"))
 
 

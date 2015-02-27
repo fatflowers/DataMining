@@ -7,6 +7,7 @@ from itertools import *
 import AutomaticClustering as AutoC
 from random import randint
 import cPickle
+from UserTrajectory import *
 # __author__ = 'Administrator'
 # from OpticsClusterArea import *
 # import numpy as np
@@ -30,34 +31,7 @@ import cPickle
 # writePointwiseDistance(x)
 #
 
-# 在AutoC的TreeNode类中添加neighbor属性，为列表
-def linkClusters(levelNodes, stayPointNumber):
-    dupStayPointNumber = list(stayPointNumber)
-    nextLevelNodes = []
-    for iterNode in levelNodes:
-        if len(iterNode.children) > 0:
-            nextLevelNodes += iterNode.children
 
-    if len(levelNodes) != 1:
-        for iterNode in range(len(levelNodes)):
-            for userTrajectory in dupStayPointNumber:
-                for trajectory in userTrajectory:
-                    flag = False
-                    for iterStayPoint in range(len(trajectory)):
-                        if trajectory[iterStayPoint] == -1:
-                            continue
-                        if levelNodes[iterNode].start <= trajectory[iterStayPoint] <= levelNodes[iterNode].end:
-                            flag = True
-                        # 上一个节点在node这个cluster中
-                        elif flag and (levelNodes[iterNode].start > trajectory[iterStayPoint] or trajectory[iterStayPoint] > levelNodes[iterNode].end):
-                            for neighborNode in levelNodes:
-                                if neighborNode.start != levelNodes[iterNode].start and neighborNode.end != levelNodes[iterNode].end and levelNodes[iterNode].start <= trajectory[iterStayPoint] <= levelNodes[iterNode].end:
-                                    levelNodes[iterNode].neighbor.append((neighborNode.start, neighborNode.end))
-                                    # -1代表访问过
-                                    trajectory[iterStayPoint] = -1
-
-    if len(nextLevelNodes) > 0:
-        linkClusters(nextLevelNodes, stayPointNumber)
 
 
 def test(a):
@@ -111,26 +85,26 @@ def findKthNumber(oneRow, k):
         return findKthNumber(Sb[:lenSb], k - lenSa)
 
 
-opticsResult = cPickle.load(open('opticsResult.pkl', 'rb'))
-RD = opticsResult[0]
-CD = opticsResult[1]
-order = opticsResult[2]
-RPlot = []
-RPoints = []
-
-
-
-
-rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
-# AutoC.graphTree(rootNode, RPlot)
-
-#get only the leaves of the tree
-leaves = AutoC.getLeaves(rootNode, [])
-
-#graph the points and the leaf clusters that have been found by OPTICS
-fig = plt.figure()
-ax = fig.add_subplot(111)
-LocHistory = cPickle.load(open('LocHistory.pkl', 'rb'))
+# opticsResult = cPickle.load(open('opticsResult.pkl', 'rb'))
+# RD = opticsResult[0]
+# CD = opticsResult[1]
+# order = opticsResult[2]
+# RPlot = []
+# RPoints = []
+#
+#
+#
+#
+# rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
+# # AutoC.graphTree(rootNode, RPlot)
+#
+# #get only the leaves of the tree
+# leaves = AutoC.getLeaves(rootNode, [])
+#
+# #graph the points and the leaf clusters that have been found by OPTICS
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+LocHistory = cPickle.load(open('LocHistory2.pkl', 'rb'))
 
 numPoints = 0
 for user in LocHistory:

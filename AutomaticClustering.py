@@ -280,6 +280,8 @@ class TreeNode(object):
         self.parentNode = parentNode
         self.children = []
         self.splitpoint = -1
+        # neighbors
+        self.neighbor = []
 
     def __str__(self):
         return "start: %d, end %d, split: %d" % (self.start, self.end, self.splitpoint)
