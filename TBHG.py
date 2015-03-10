@@ -90,11 +90,13 @@ def getTBHG():
     ### ¥”¥≈≈Ã∂¡»°æ‡¿Îæÿ’Û
     # OP.writePointwiseDistance(stayPointMatrix)
 
-    RD, CD, order = OP.optics(stayPointMatrix, 9)
+    # RD, CD, order = OP.optics(stayPointMatrix, 9)
+    #
+    # cPickle.dump([RD, CD, order], open('opticsResult2.pkl', 'wb'))
 
-    cPickle.dump([RD, CD, order], open('opticsResult2.pkl', 'wb'))
-
+    RD, CD, order = cPickle.load(open('opticsResult2.pkl', 'rb'))
     RPlot = []
+
     RPoints = []
 
     for item in order:
@@ -102,8 +104,10 @@ def getTBHG():
         RPoints.append([stayPointMatrix[item][0], stayPointMatrix[item][1]]) #points in their order determined by OPTICS
 
     #hierarchically cluster the data
-    rootNode = AutoC.automaticCluster(RPlot, RPoints)
-    cPickle.dump(rootNode, open('rootNode2.pkl', 'wb'))
+    # rootNode = AutoC.automaticCluster(RPlot, RPoints)
+    # cPickle.dump(rootNode, open('rootNode2.pkl', 'wb'))
+
+    rootNode = cPickle.load(open('rootNode2.pkl', 'rb'))
     AutoC.graphTree(rootNode, RPlot)
 
     linkClusters(rootNode, stayPointNumber)

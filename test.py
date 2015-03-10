@@ -85,25 +85,25 @@ def findKthNumber(oneRow, k):
         return findKthNumber(Sb[:lenSb], k - lenSa)
 
 
-# opticsResult = cPickle.load(open('opticsResult.pkl', 'rb'))
-# RD = opticsResult[0]
-# CD = opticsResult[1]
-# order = opticsResult[2]
-# RPlot = []
-# RPoints = []
-#
-#
-#
-#
-# rootNode = cPickle.load(open('rootNode.pkl', 'rb'))
-# # AutoC.graphTree(rootNode, RPlot)
-#
-# #get only the leaves of the tree
-# leaves = AutoC.getLeaves(rootNode, [])
-#
-# #graph the points and the leaf clusters that have been found by OPTICS
-# fig = plt.figure()
-# ax = fig.add_subplot(111)
+opticsResult = cPickle.load(open('opticsResult2.pkl', 'rb'))
+RD = opticsResult[0]
+CD = opticsResult[1]
+order = opticsResult[2]
+RPlot = []
+RPoints = []
+
+
+
+
+rootNode = cPickle.load(open('rootNode2.pkl', 'rb'))
+# AutoC.graphTree(rootNode, RPlot)
+
+#get only the leaves of the tree
+leaves = AutoC.getLeaves(rootNode, [])
+
+#graph the points and the leaf clusters that have been found by OPTICS
+fig = plt.figure()
+ax = fig.add_subplot(111)
 LocHistory = cPickle.load(open('LocHistory2.pkl', 'rb'))
 
 numPoints = 0
@@ -139,12 +139,13 @@ for item, c in zip(leaves, colors):
     for v in range(item.start,item.end):
         node.append(RPoints[v])
     node = np.array(node)
-    if colorCounter / len(colorString) == 0:
-        marker = 'o'
-    elif colorCounter / len(colorString) == 1:
-        marker = '+'
-    else:
-        marker = '*'
+    marker = 'o'
+    # if colorCounter / len(colorString) == 0:
+    #     marker = 'o'
+    # elif colorCounter / len(colorString) == 1:
+    #     marker = '+'
+    # else:
+    #     marker = '*'
     ax.plot(node[:,0],node[:,1], c + marker, ms=5)
 
     colorCounter += 1
